@@ -1,0 +1,730 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>EmailBot Pro - 24/7 Email Marketing Automation</title>
+    <link rel="stylesheet" href="style.css">
+    <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>📧</text></svg>">
+</head>
+<body>
+    <!-- Toast Notifications -->
+    <div id="toast-container" class="toast-container"></div>
+
+    <!-- Loading Overlay -->
+    <div id="loading-overlay" class="loading-overlay hidden">
+        <div class="loading-spinner"></div>
+        <p>Processing...</p>
+    </div>
+
+    <!-- Main App Container -->
+    <div class="app-container">
+        <!-- Sidebar -->
+        <div class="sidebar" id="sidebar">
+            <div class="sidebar-header">
+                <div class="logo">
+                    <span class="logo-icon">📧</span>
+                    <span class="logo-text">EmailBot Pro</span>
+                </div>
+                <button class="sidebar-toggle" id="sidebarToggle">
+                    <span></span>
+                    <span></span>
+                    <span></span>
+                </button>
+            </div>
+            
+            <nav class="sidebar-nav">
+                <a href="#dashboard" class="nav-item active" data-section="dashboard">
+                    <span class="nav-icon">📊</span>
+                    <span class="nav-text">Dashboard</span>
+                </a>
+                <a href="#scraper" class="nav-item" data-section="scraper">
+                    <span class="nav-icon">🔍</span>
+                    <span class="nav-text">Lead Scraper</span>
+                </a>
+                <a href="#writer" class="nav-item" data-section="writer">
+                    <span class="nav-icon">✍️</span>
+                    <span class="nav-text">AI Email Writer</span>
+                </a>
+                <a href="#campaigns" class="nav-item" data-section="campaigns">
+                    <span class="nav-icon">📋</span>
+                    <span class="nav-text">Campaigns</span>
+                </a>
+                <a href="#sender" class="nav-item" data-section="sender">
+                    <span class="nav-icon">📤</span>
+                    <span class="nav-text">Email Sender</span>
+                </a>
+                <a href="#analytics" class="nav-item" data-section="analytics">
+                    <span class="nav-icon">📈</span>
+                    <span class="nav-text">Analytics</span>
+                </a>
+                <a href="#settings" class="nav-item" data-section="settings">
+                    <span class="nav-icon">⚙️</span>
+                    <span class="nav-text">Settings</span>
+                </a>
+                <a href="#import-export" class="nav-item" data-section="import-export">
+                    <span class="nav-icon">💾</span>
+                    <span class="nav-text">Import/Export</span>
+                </a>
+            </nav>
+
+            <!-- Automation Controls -->
+            <div class="automation-controls">
+                <div class="automation-status">
+                    <div class="status-indicator" id="automationStatus">
+                        <span class="status-dot stopped"></span>
+                        <span class="status-text">Stopped</span>
+                    </div>
+                </div>
+                <div class="control-buttons">
+                    <button class="btn btn--primary btn--sm" id="startAutomation">▶ Start</button>
+                    <button class="btn btn--secondary btn--sm" id="pauseAutomation" disabled>⏸ Pause</button>
+                    <button class="btn btn--outline btn--sm" id="stopAutomation" disabled>⏹ Stop</button>
+                </div>
+            </div>
+        </div>
+
+        <!-- Main Content -->
+        <div class="main-content">
+            <!-- Top Bar -->
+            <div class="top-bar">
+                <div class="top-bar-left">
+                    <h1 class="page-title" id="pageTitle">Dashboard</h1>
+                    <div class="breadcrumb" id="breadcrumb">Home / Dashboard</div>
+                </div>
+                <div class="top-bar-right">
+                    <button class="btn btn--outline btn--sm" id="themeToggle">🌓</button>
+                    <div class="stats-quick">
+                        <div class="stat-item">
+                            <span class="stat-label">Queue</span>
+                            <span class="stat-value" id="queueCount">0</span>
+                        </div>
+                        <div class="stat-item">
+                            <span class="stat-label">Sent Today</span>
+                            <span class="stat-value" id="sentToday">0</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Content Sections -->
+            <div class="content-wrapper">
+                <!-- Dashboard Section -->
+                <section id="dashboard-section" class="content-section active">
+                    <div class="dashboard-grid">
+                        <div class="stat-card">
+                            <div class="stat-card-icon">👥</div>
+                            <div class="stat-card-content">
+                                <div class="stat-card-value" id="totalLeads">0</div>
+                                <div class="stat-card-label">Total Leads</div>
+                            </div>
+                        </div>
+                        <div class="stat-card">
+                            <div class="stat-card-icon">📧</div>
+                            <div class="stat-card-content">
+                                <div class="stat-card-value" id="emailsSent">0</div>
+                                <div class="stat-card-label">Emails Sent</div>
+                            </div>
+                        </div>
+                        <div class="stat-card">
+                            <div class="stat-card-icon">📊</div>
+                            <div class="stat-card-content">
+                                <div class="stat-card-value" id="successRate">0%</div>
+                                <div class="stat-card-label">Success Rate</div>
+                            </div>
+                        </div>
+                        <div class="stat-card">
+                            <div class="stat-card-icon">⚡</div>
+                            <div class="stat-card-content">
+                                <div class="stat-card-value" id="activeCampaigns">0</div>
+                                <div class="stat-card-label">Active Campaigns</div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="dashboard-content">
+                        <div class="dashboard-left">
+                            <div class="card">
+                                <div class="card__header">
+                                    <h3>Recent Activity</h3>
+                                </div>
+                                <div class="card__body">
+                                    <div class="activity-log" id="recentActivity">
+                                        <div class="activity-item">
+                                            <span class="activity-time">Just now</span>
+                                            <span class="activity-message">System initialized</span>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="dashboard-right">
+                            <div class="card">
+                                <div class="card__header">
+                                    <h3>Quick Actions</h3>
+                                </div>
+                                <div class="card__body">
+                                    <div class="quick-actions">
+                                        <button class="btn btn--primary btn--full-width" onclick="showSection('scraper')">🔍 Find New Leads</button>
+                                        <button class="btn btn--secondary btn--full-width" onclick="showSection('writer')">✍️ Write Email</button>
+                                        <button class="btn btn--outline btn--full-width" onclick="showSection('campaigns')">📋 Create Campaign</button>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </section>
+
+                <!-- Lead Scraper Section -->
+                <section id="scraper-section" class="content-section">
+                    <div class="section-header">
+                        <h2>AI Lead Scraper</h2>
+                        <p>Find and collect leads from various sources using AI-powered scraping</p>
+                    </div>
+
+                    <div class="scraper-content">
+                        <div class="card">
+                            <div class="card__header">
+                                <h3>Search Parameters</h3>
+                            </div>
+                            <div class="card__body">
+                                <form id="scraperForm" class="scraper-form">
+                                    <div class="form-row">
+                                        <div class="form-group">
+                                            <label class="form-label">Industry/Keywords</label>
+                                            <input type="text" class="form-control" id="scraperKeywords" placeholder="e.g., tech startup, marketing agency">
+                                        </div>
+                                        <div class="form-group">
+                                            <label class="form-label">Location</label>
+                                            <input type="text" class="form-control" id="scraperLocation" placeholder="e.g., San Francisco, CA">
+                                        </div>
+                                    </div>
+                                    <div class="form-row">
+                                        <div class="form-group">
+                                            <label class="form-label">Contact Type</label>
+                                            <select class="form-control" id="scraperContactType">
+                                                <option value="ceo">CEO/Founder</option>
+                                                <option value="marketing">Marketing Director</option>
+                                                <option value="sales">Sales Manager</option>
+                                                <option value="hr">HR Director</option>
+                                                <option value="cto">CTO/Tech Lead</option>
+                                            </select>
+                                        </div>
+                                        <div class="form-group">
+                                            <label class="form-label">Company Size</label>
+                                            <select class="form-control" id="scraperCompanySize">
+                                                <option value="startup">Startup (1-10)</option>
+                                                <option value="small">Small (11-50)</option>
+                                                <option value="medium">Medium (51-200)</option>
+                                                <option value="large">Large (200+)</option>
+                                            </select>
+                                        </div>
+                                    </div>
+                                    <div class="form-actions">
+                                        <button type="submit" class="btn btn--primary">🔍 Start Scraping</button>
+                                        <button type="button" class="btn btn--outline" id="loadSampleLeads">📝 Load Sample Data</button>
+                                    </div>
+                                </form>
+                            </div>
+                        </div>
+
+                        <div class="card">
+                            <div class="card__header">
+                                <h3>Scraped Leads</h3>
+                                <div class="card-actions">
+                                    <button class="btn btn--sm btn--outline" id="exportLeads">Export CSV</button>
+                                    <button class="btn btn--sm btn--secondary" id="clearLeads">Clear All</button>
+                                </div>
+                            </div>
+                            <div class="card__body">
+                                <div class="leads-table-container">
+                                    <table class="leads-table" id="leadsTable">
+                                        <thead>
+                                            <tr>
+                                                <th><input type="checkbox" id="selectAllLeads"></th>
+                                                <th>Name</th>
+                                                <th>Company</th>
+                                                <th>Email</th>
+                                                <th>Location</th>
+                                                <th>Status</th>
+                                                <th>Actions</th>
+                                            </tr>
+                                        </thead>
+                                        <tbody id="leadsTableBody">
+                                            <!-- Leads will be inserted here -->
+                                        </tbody>
+                                    </table>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </section>
+
+                <!-- AI Email Writer Section -->
+                <section id="writer-section" class="content-section">
+                    <div class="section-header">
+                        <h2>AI Email Writer</h2>
+                        <p>Create personalized emails using AI templates and smart merge tags</p>
+                    </div>
+
+                    <div class="writer-content">
+                        <div class="writer-left">
+                            <div class="card">
+                                <div class="card__header">
+                                    <h3>Email Composer</h3>
+                                </div>
+                                <div class="card__body">
+                                    <form id="emailWriterForm">
+                                        <div class="form-group">
+                                            <label class="form-label">Template</label>
+                                            <select class="form-control" id="emailTemplate">
+                                                <option value="">Create New Email</option>
+                                                <option value="1">Cold Outreach - B2B</option>
+                                                <option value="2">Follow-up Sequence</option>
+                                            </select>
+                                        </div>
+                                        <div class="form-group">
+                                            <label class="form-label">Tone</label>
+                                            <select class="form-control" id="emailTone">
+                                                <option value="professional">Professional</option>
+                                                <option value="friendly">Friendly</option>
+                                                <option value="casual">Casual</option>
+                                                <option value="sales">Sales</option>
+                                            </select>
+                                        </div>
+                                        <div class="form-group">
+                                            <label class="form-label">Subject Line</label>
+                                            <input type="text" class="form-control" id="emailSubject" placeholder="Enter subject line">
+                                            <button type="button" class="btn btn--sm btn--outline generate-subject">✨ Generate with AI</button>
+                                        </div>
+                                        <div class="form-group">
+                                            <label class="form-label">Email Body</label>
+                                            <textarea class="form-control" id="emailBody" rows="10" placeholder="Write your email content here..."></textarea>
+                                        </div>
+                                        <div class="form-actions">
+                                            <button type="button" class="btn btn--primary" id="generateEmail">🤖 Generate with AI</button>
+                                            <button type="button" class="btn btn--secondary" id="saveTemplate">💾 Save Template</button>
+                                            <button type="button" class="btn btn--outline" id="previewEmail">👁️ Preview</button>
+                                        </div>
+                                    </form>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="writer-right">
+                            <div class="card">
+                                <div class="card__header">
+                                    <h3>Merge Tags</h3>
+                                </div>
+                                <div class="card__body">
+                                    <div class="merge-tags">
+                                        <div class="merge-tag-item" data-tag="{name}">
+                                            <code>{name}</code>
+                                            <span>Contact Name</span>
+                                        </div>
+                                        <div class="merge-tag-item" data-tag="{company}">
+                                            <code>{company}</code>
+                                            <span>Company Name</span>
+                                        </div>
+                                        <div class="merge-tag-item" data-tag="{location}">
+                                            <code>{location}</code>
+                                            <span>Location</span>
+                                        </div>
+                                        <div class="merge-tag-item" data-tag="{industry}">
+                                            <code>{industry}</code>
+                                            <span>Industry</span>
+                                        </div>
+                                        <div class="merge-tag-item" data-tag="{title}">
+                                            <code>{title}</code>
+                                            <span>Job Title</span>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="card">
+                                <div class="card__header">
+                                    <h3>Live Preview</h3>
+                                </div>
+                                <div class="card__body">
+                                    <div class="email-preview" id="emailPreview">
+                                        <div class="preview-subject" id="previewSubject">Subject: Your email subject</div>
+                                        <div class="preview-body" id="previewBody">Your email content will appear here...</div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </section>
+
+                <!-- Campaigns Section -->
+                <section id="campaigns-section" class="content-section">
+                    <div class="section-header">
+                        <h2>Campaign Manager</h2>
+                        <p>Create, manage and monitor your email campaigns</p>
+                    </div>
+
+                    <div class="campaigns-content">
+                        <div class="card">
+                            <div class="card__header">
+                                <h3>Active Campaigns</h3>
+                                <button class="btn btn--primary" id="createCampaignBtn">+ Create Campaign</button>
+                            </div>
+                            <div class="card__body">
+                                <div class="campaigns-grid" id="campaignsGrid">
+                                    <!-- Campaigns will be loaded here -->
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </section>
+
+                <!-- Email Sender Section -->
+                <section id="sender-section" class="content-section">
+                    <div class="section-header">
+                        <h2>Email Sender</h2>
+                        <p>Manage Gmail accounts and monitor email sending</p>
+                    </div>
+
+                    <div class="sender-content">
+                        <div class="sender-left">
+                            <div class="card">
+                                <div class="card__header">
+                                    <h3>Gmail Accounts</h3>
+                                </div>
+                                <div class="card__body">
+                                    <div class="gmail-accounts" id="gmailAccounts">
+                                        <div class="gmail-account demo-account">
+                                            <div class="account-info">
+                                                <div class="account-email">demo@example.com</div>
+                                                <div class="account-status">Connected (Demo)</div>
+                                            </div>
+                                            <div class="account-stats">
+                                                <span class="sent-today">0/500 today</span>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <button class="btn btn--outline btn--full-width" id="connectGmailBtn">+ Connect Gmail Account</button>
+                                </div>
+                            </div>
+
+                            <div class="card">
+                                <div class="card__header">
+                                    <h3>Sending Settings</h3>
+                                </div>
+                                <div class="card__body">
+                                    <div class="form-group">
+                                        <label class="form-label">Send Interval (seconds)</label>
+                                        <input type="number" class="form-control" id="sendInterval" value="30" min="10" max="3600">
+                                    </div>
+                                    <div class="form-group">
+                                        <label class="form-label">Daily Limit per Account</label>
+                                        <input type="number" class="form-control" id="dailyLimit" value="500" min="1" max="2000">
+                                    </div>
+                                    <div class="form-group">
+                                        <label class="form-label">Working Hours</label>
+                                        <div class="time-range">
+                                            <input type="time" class="form-control" id="workingHoursStart" value="09:00">
+                                            <span>to</span>
+                                            <input type="time" class="form-control" id="workingHoursEnd" value="17:00">
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="sender-right">
+                            <div class="card">
+                                <div class="card__header">
+                                    <h3>Email Queue</h3>
+                                </div>
+                                <div class="card__body">
+                                    <div class="queue-stats">
+                                        <div class="queue-stat">
+                                            <span class="queue-count" id="queuePending">0</span>
+                                            <span class="queue-label">Pending</span>
+                                        </div>
+                                        <div class="queue-stat">
+                                            <span class="queue-count" id="queueSending">0</span>
+                                            <span class="queue-label">Sending</span>
+                                        </div>
+                                        <div class="queue-stat">
+                                            <span class="queue-count" id="queueSent">0</span>
+                                            <span class="queue-label">Sent</span>
+                                        </div>
+                                        <div class="queue-stat">
+                                            <span class="queue-count" id="queueFailed">0</span>
+                                            <span class="queue-label">Failed</span>
+                                        </div>
+                                    </div>
+                                    <div class="queue-list" id="emailQueue">
+                                        <div class="queue-item">
+                                            <div class="queue-email">No emails in queue</div>
+                                            <div class="queue-status">Ready to send</div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </section>
+
+                <!-- Analytics Section -->
+                <section id="analytics-section" class="content-section">
+                    <div class="section-header">
+                        <h2>Analytics & Logs</h2>
+                        <p>Track email performance and system activity</p>
+                    </div>
+
+                    <div class="analytics-content">
+                        <div class="analytics-stats">
+                            <div class="stat-card">
+                                <div class="stat-card-icon">📊</div>
+                                <div class="stat-card-content">
+                                    <div class="stat-card-value" id="analyticsOpened">0%</div>
+                                    <div class="stat-card-label">Open Rate</div>
+                                </div>
+                            </div>
+                            <div class="stat-card">
+                                <div class="stat-card-icon">👆</div>
+                                <div class="stat-card-content">
+                                    <div class="stat-card-value" id="analyticsClicked">0%</div>
+                                    <div class="stat-card-label">Click Rate</div>
+                                </div>
+                            </div>
+                            <div class="stat-card">
+                                <div class="stat-card-icon">📈</div>
+                                <div class="stat-card-content">
+                                    <div class="stat-card-value" id="analyticsResponse">0%</div>
+                                    <div class="stat-card-label">Response Rate</div>
+                                </div>
+                            </div>
+                            <div class="stat-card">
+                                <div class="stat-card-icon">⚡</div>
+                                <div class="stat-card-content">
+                                    <div class="stat-card-value" id="analyticsBounce">0%</div>
+                                    <div class="stat-card-label">Bounce Rate</div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="analytics-charts">
+                            <div class="card">
+                                <div class="card__header">
+                                    <h3>System Logs</h3>
+                                </div>
+                                <div class="card__body">
+                                    <div class="logs-container" id="systemLogs">
+                                        <!-- Logs will be inserted here -->
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </section>
+
+                <!-- Settings Section -->
+                <section id="settings-section" class="content-section">
+                    <div class="section-header">
+                        <h2>Settings</h2>
+                        <p>Configure your automation system</p>
+                    </div>
+
+                    <div class="settings-content">
+                        <div class="settings-left">
+                            <div class="card">
+                                <div class="card__header">
+                                    <h3>API Keys</h3>
+                                </div>
+                                <div class="card__body">
+                                    <div class="form-group">
+                                        <label class="form-label">OpenAI API Key (Optional)</label>
+                                        <input type="password" class="form-control" id="openaiApiKey" placeholder="sk-...">
+                                        <small>Used for AI email generation</small>
+                                    </div>
+                                    <div class="form-group">
+                                        <label class="form-label">Hugging Face API Key (Optional)</label>
+                                        <input type="password" class="form-control" id="huggingfaceApiKey" placeholder="hf_...">
+                                        <small>Alternative AI provider</small>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="card">
+                                <div class="card__header">
+                                    <h3>Email Settings</h3>
+                                </div>
+                                <div class="card__body">
+                                    <div class="form-group">
+                                        <label class="form-label">Email Signature</label>
+                                        <textarea class="form-control" id="emailSignature" rows="3" placeholder="Best regards,
+Your Name"></textarea>
+                                    </div>
+                                    <div class="form-group">
+                                        <label class="form-label">
+                                            <input type="checkbox" id="includeUnsubscribe" checked>
+                                            Include unsubscribe link
+                                        </label>
+                                    </div>
+                                    <div class="form-group">
+                                        <label class="form-label">
+                                            <input type="checkbox" id="trackOpens" checked>
+                                            Track email opens
+                                        </label>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="settings-right">
+                            <div class="card">
+                                <div class="card__header">
+                                    <h3>Automation</h3>
+                                </div>
+                                <div class="card__body">
+                                    <div class="form-group">
+                                        <label class="form-label">
+                                            <input type="checkbox" id="smartScheduling" checked>
+                                            Smart scheduling (avoid weekends/holidays)
+                                        </label>
+                                    </div>
+                                    <div class="form-group">
+                                        <label class="form-label">
+                                            <input type="checkbox" id="warmupMode">
+                                            Warm-up mode (gradual volume increase)
+                                        </label>
+                                    </div>
+                                    <div class="form-group">
+                                        <label class="form-label">
+                                            <input type="checkbox" id="autoRetry" checked>
+                                            Auto-retry failed emails
+                                        </label>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="card">
+                                <div class="card__header">
+                                    <h3>Data & Privacy</h3>
+                                </div>
+                                <div class="card__body">
+                                    <div class="form-actions">
+                                        <button class="btn btn--outline btn--full-width" id="clearAllData">🗑️ Clear All Data</button>
+                                        <button class="btn btn--secondary btn--full-width" id="resetSettings">🔄 Reset Settings</button>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="settings-actions">
+                        <button class="btn btn--primary" id="saveSettings">💾 Save Settings</button>
+                    </div>
+                </section>
+
+                <!-- Import/Export Section -->
+                <section id="import-export-section" class="content-section">
+                    <div class="section-header">
+                        <h2>Import/Export</h2>
+                        <p>Backup and restore your data</p>
+                    </div>
+
+                    <div class="import-export-content">
+                        <div class="import-export-left">
+                            <div class="card">
+                                <div class="card__header">
+                                    <h3>Import Data</h3>
+                                </div>
+                                <div class="card__body">
+                                    <div class="form-group">
+                                        <label class="form-label">Import Leads (CSV)</label>
+                                        <input type="file" class="form-control" id="importLeadsFile" accept=".csv">
+                                        <button class="btn btn--outline" id="importLeadsBtn">📄 Import Leads</button>
+                                    </div>
+                                    <div class="form-group">
+                                        <label class="form-label">Import Templates (JSON)</label>
+                                        <input type="file" class="form-control" id="importTemplatesFile" accept=".json">
+                                        <button class="btn btn--outline" id="importTemplatesBtn">📝 Import Templates</button>
+                                    </div>
+                                    <div class="form-group">
+                                        <label class="form-label">Restore Backup (JSON)</label>
+                                        <input type="file" class="form-control" id="restoreBackupFile" accept=".json">
+                                        <button class="btn btn--primary" id="restoreBackupBtn">🔄 Restore Backup</button>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="import-export-right">
+                            <div class="card">
+                                <div class="card__header">
+                                    <h3>Export Data</h3>
+                                </div>
+                                <div class="card__body">
+                                    <div class="export-actions">
+                                        <button class="btn btn--outline btn--full-width" id="exportLeadsBtn">📊 Export Leads (CSV)</button>
+                                        <button class="btn btn--outline btn--full-width" id="exportTemplatesBtn">📝 Export Templates (JSON)</button>
+                                        <button class="btn btn--outline btn--full-width" id="exportCampaignsBtn">📋 Export Campaigns (JSON)</button>
+                                        <button class="btn btn--outline btn--full-width" id="exportAnalyticsBtn">📈 Export Analytics (CSV)</button>
+                                        <button class="btn btn--primary btn--full-width" id="createBackupBtn">💾 Create Full Backup (JSON)</button>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="card">
+                                <div class="card__header">
+                                    <h3>CSV Format Guide</h3>
+                                </div>
+                                <div class="card__body">
+                                    <p>For lead imports, use this CSV format:</p>
+                                    <code>name,email,company,location,industry,title,phone,website</code>
+                                    <p style="margin-top: 10px;">Example:</p>
+                                    <code>John Doe,john@example.com,Acme Corp,NY,Tech,CEO,555-0123,acme.com</code>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </section>
+            </div>
+        </div>
+    </div>
+
+    <!-- Modal Templates -->
+    <div id="campaignModal" class="modal hidden">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3>Create New Campaign</h3>
+                <button class="modal-close">&times;</button>
+            </div>
+            <div class="modal-body">
+                <form id="campaignForm">
+                    <div class="form-group">
+                        <label class="form-label">Campaign Name</label>
+                        <input type="text" class="form-control" id="campaignName" required>
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label">Email Template</label>
+                        <select class="form-control" id="campaignTemplate" required>
+                            <option value="">Select Template</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label">Target Leads</label>
+                        <select class="form-control" id="campaignLeads">
+                            <option value="all">All Leads</option>
+                            <option value="active">Active Leads Only</option>
+                            <option value="untargeted">Untargeted Leads</option>
+                        </select>
+                    </div>
+                    <div class="form-actions">
+                        <button type="button" class="btn btn--outline" onclick="closeModal('campaignModal')">Cancel</button>
+                        <button type="submit" class="btn btn--primary">Create Campaign</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <script src="app.js"></script>
+</body>
+</html>
